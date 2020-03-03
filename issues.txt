@@ -1,0 +1,2 @@
+Web:
+1. Use of Dimensions is messing with the rendered component's width while changing window size (Maximizing)

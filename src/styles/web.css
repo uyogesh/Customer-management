@@ -1,0 +1,10 @@
+.searchBar {
+    position: fixed;
+    z-index: 100;
+}
+
+#body-contact {
+    top: 100px;
+    padding-right: 300px;
+    padding-left: 300px;
+}

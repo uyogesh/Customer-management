@@ -1,0 +1,47 @@
+agentName = "master"
+pipeline{
+    agent{label agentName}
+
+    stages{
+        stage('Cloning GitLab')
+        {
+            steps{
+                git branch:'development',
+                credentialsId:'53cbf938-c4f8-4523-9902-2404055e1a64',
+                url:'https://gitlab.com/devinca/inca-mobile.git'
+            }
+        }
+        stage('Install Dependencies')
+        {
+            steps{
+                sh 'echo Use if neccessary'
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        stage('Deploy')
+        {
+            steps{
+                sh 'sshpass -p "ku92K2hYrUHE" ssh -p 65002 u962097937@185.224.138.112 "rm -rf /home/u962097937/public_html/public_html/devINCA/*"'
+                sh 'sshpass -p "ku92K2hYrUHE" scp -P 65002 -r /var/lib/jenkins/workspace/INCA-Web-FrontEnd/build/* u962097937@185.224.138.112:/home/u962097937/public_html/public_html/devINCA/'
+                sh 'sshpass -p "ku92K2hYrUHE" ssh -p 65002 u962097937@185.224.138.112 "chmod -R 755 /home/u962097937/public_html/public_html/devINCA/"'
+            }
+        }
+    }
+     post{
+      success{
+          echo 'This will run only if successful'
+      }
+      failure {
+          emailext body: '$DEFAULT_CONTENT', recipientProviders: [culprits(), developers()], subject: '$DEFAULT_SUBJECT', to: '$DEFAULT_RECIPIENTS'
+          emailextrecipients([developers()])
+      }
+      unstable {
+             echo 'This will run only if the run was marked as unstable'
+         }
+         changed {
+             echo 'This will run only if the state of the Pipeline has changed'
+             echo 'For example, if the Pipeline was previously failing but is now successful'
+         }
+  }
+}
